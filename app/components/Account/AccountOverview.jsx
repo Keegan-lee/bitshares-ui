@@ -149,6 +149,15 @@ class AccountOverview extends React.Component {
                     <Translate content="account.qty" />
                 </th>
                 <th
+                    onClick={this._toggleSortOrder.bind(this, "inOrders")}
+                    className={cnames("clickable is-sortable", {
+                        "is-active": this.state.sortKey === "inOrders"
+                    })}
+                    style={{textAlign: "right"}}
+                >
+                    <Translate content="account.inOrders" />
+                </th>
+                <th
                     onClick={this._toggleSortOrder.bind(this, "priceValue")}
                     className={cnames(
                         "column-hide-small clickable is-sortable",

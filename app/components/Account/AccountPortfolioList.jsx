@@ -3,6 +3,7 @@ import debounceRender from "react-debounce-render";
 import BalanceComponent from "../Utility/BalanceComponent";
 import {BalanceValueComponent} from "../Utility/EquivalentValueComponent";
 import {Market24HourChangeComponent} from "../Utility/MarketChangeComponent";
+import FormattedAsset from "../Utility/FormattedAsset";
 import assetUtils from "common/asset_utils";
 import counterpart from "counterpart";
 import {Link} from "react-router-dom";
@@ -60,6 +61,7 @@ class AccountPortfolioList extends React.Component {
         this.priceRefs = {};
         this.valueRefs = {};
         this.changeRefs = {};
+        this.ordersRefs = {};
         for (let key in this.sortFunctions) {
             this.sortFunctions[key] = this.sortFunctions[key].bind(this);
         }
@@ -283,6 +285,13 @@ class AccountPortfolioList extends React.Component {
 
                 return direction ? aChange - bChange : bChange - aChange;
             }
+        },
+        inOrders: function(a, b, force = false) {
+            if (Number(this.ordersRefs[a.key]) < Number(this.ordersRefs[b.key]))
+                return this.props.sortDirection || force ? -1 : 1;
+
+            if (Number(this.ordersRefs[a.key]) > Number(this.ordersRefs[b.key]))
+                return this.props.sortDirection || force ? 1 : -1;
         }
     };
 
@@ -596,6 +605,10 @@ class AccountPortfolioList extends React.Component {
                 asset
             );
 
+            this.ordersRefs[asset.get("symbol")] = hasOnOrder
+                ? orders[asset.get("id")]
+                : 0;
+
             {
                 /* Asset and Backing Asset Prefixes */
             }
@@ -660,6 +673,16 @@ class AccountPortfolioList extends React.Component {
                         {hasBalance || hasOnOrder ? (
                             <BalanceComponent balance={balance} hide_asset />
                         ) : null}
+                    </td>
+                    <td stlye={{textAlign: "right"}}>
+                        {hasOnOrder ? (
+                            <FormattedAsset
+                                amount={orders[asset.get("id")]}
+                                asset={asset.get("id")}
+                            />
+                        ) : (
+                            "--"
+                        )}
                     </td>
                     <td
                         style={{textAlign: "right"}}
